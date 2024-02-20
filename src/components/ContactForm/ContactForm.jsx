@@ -1,71 +1,76 @@
 import { useId } from "react";
-import { useState } from "react";
 import * as Yup from "yup";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import styles from './ContactForm.module.css';
+import { nanoid } from "nanoid";
+import { addContact } from "../../redux/contactsSlice";
+import { useDispatch } from "react-redux";
 
-const FeedbackSchema = Yup.object().shape({
-  addUser: Yup.string().min(3, "Too Short!").max(50, "Too Long!").required("Required"),
-  addNumber: Yup.string().min(7, "Too short").max(14, "Too long").required("Required"),
+const userSchema = Yup.object().shape({
+  name: Yup.string()
+    .required("Name is required")
+    .min(3, "Minimum 3 characters")
+    .max(50, "Maximum 50 characters"),
+  number: Yup.string()
+    .required("Number is required")
+    .min(3, "Minimum 3 characters")
+    .max(50, "Maximum 50 characters")
+    .matches(/^\+?[0-9\s-]+$/, "Invalid phone number"),
 });
 
+export default function ContactForm() {
+  const nameField = useId();
+  const numberField = useId();
 
-const initialValues = {
-  addUser: "",
-  addNumber: "",
-};
-
-export const ContactForm = ({ addNewUser }) => {
-    const nameFieldId = useId();
-    const nummberlFieldId = useId();
-
-    const [newUser, setNewUser] = useState("");
-    const [newNumber, setNewNumber] = useState("");
-
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        addNewUser(newUser, newNumber);
-        setNewUser("");
-        setNewNumber("");
-    };
-
+  const dispatch = useDispatch();
+  const handleAddContact = (newContact) => {
+    dispatch(addContact(newContact));
+  };
 
     return (
         <div className={styles.container}>
             <Formik
-                initialValues={initialValues}
-                validationSchema={FeedbackSchema}
-                
+                initialValues={{
+                  name: "",
+                  number: "",
+                }}
+                validationSchema={userSchema}
+                onSubmit={(values, actions) => {
+                  const newContact = {
+                    id: nanoid(),
+                    name: values.name.replace(/\b\w/g, (l) => l.toUpperCase()),
+                    number: values.number,
+                  };
+
+                  handleAddContact(newContact);
+                  actions.resetForm();
+                }}
             >
-                <Form onSubmit={handleSubmit} className={styles.form}>
+                <Form className={styles.form} autoComplete="off">
                     <div className={styles.box}>
-                        <label htmlFor={nameFieldId}>Name</label>
+                        <label htmlFor={nameField}>Name</label>
                         <Field
                             className={styles.label}
                             type="text"
                             name="addUser"
                             placeholder="Name Surname"
-                            value={newUser}
-                            onChange={(event) => setNewUser(event.target.value)}
-                            id={nameFieldId}
+                            id={nameField}
                         />
                         <ErrorMessage
                           name="addUser"
-                          component="div"
+                          component="span"
                           className={styles.error}
                         />
                     </div>
                     
                     <div className={styles.box}>
-                        <label htmlFor={nummberlFieldId}>Number</label>
+                        <label htmlFor={numberField}>Number</label>
                         <Field
                             className={styles.label}
                             type="text"
-                            name="addNumber"
-                            placeholder="Number"
-                            value={newNumber}
-                            onChange={(event) => setNewNumber(event.target.value)}
-                            id={nummberlFieldId}
+                            name="number"
+                            placeholder="Number"          
+                            id={numberField}
                         />
                         <ErrorMessage
                            name="addNumber"
@@ -79,4 +84,4 @@ export const ContactForm = ({ addNewUser }) => {
             </Formik>
         </div>
     );
-};
+}

@@ -1,54 +1,22 @@
-import { useState } from "react";
-import { useEffect } from "react";
+import { lazy, Suspense } from "react";
+import { Loader } from "../Loader/Loader";
 import styles from './Phonebook.module.css';
-import { ContactForm }  from '../ContactForm/ContactForm';
-import { SearchBox } from '../SearchBox/SearchBox';
-import { ContactList } from '../ContactList/ContactList';
-import { nanoid } from 'nanoid'
 
-import contacts from '../Data/contacts.json';
+const ContactForm = lazy(() => import("../ContactForm/ContactForm"));
+const ContactList = lazy(() => import("../ContactList/ContactList"));
+const SearchBox = lazy(() => import("../SearchBox/SearchBox"));
 
 export const Phonebook = () => {
-    const [persons, setPersons] = useState(() => {
-        const savedObjectNumbers = window.localStorage.getItem("savedNummers");
-
-        const parsedNumbers = JSON.parse(savedObjectNumbers);
-        if (parsedNumbers && typeof parsedNumbers === "object") {
-            return parsedNumbers;
-        }
-        return (contacts);
-    });
-        const [inputValue, setInputValue] = useState("");
-
-  useEffect(() => {
-    window.localStorage.setItem("savedNummers", JSON.stringify(persons));
-  }, [persons]);
-
-  const visibleUser = persons.filter((person) => person.name.toLowerCase().includes(inputValue.toLowerCase()));
-
-  const addNewUser = (newUser, newNumber) => {
-    setPersons((prevUsers) => {
-      return [...prevUsers, {
-        id: nanoid(),
-        name: newUser,
-        number: newNumber
-      }]
-    });
-    setInputValue("");
-  };
-
-  const deleteUser = (userId) => {
-    setPersons((prevUsers) => {
-      return prevUsers.filter((user) => user.id !== userId);
-    });
-  };
-
   return (
-        <div className={styles.container}>
-            <h1>Phonebook</h1>
-            <ContactForm addNewUser={addNewUser} />
-            <SearchBox value={inputValue} onChange={setInputValue} /> 
-            <ContactList items={visibleUser} onDelete={deleteUser} />
-        </div>
-    );
+    <>
+      <div className={styles.container}>
+        <Suspense fallback={<Loader />}>
+          <h1>Phonebook</h1>
+          <ContactForm />
+          <SearchBox />
+          <ContactList />
+        </Suspense>
+      </div>
+    </>
+  );
 };
