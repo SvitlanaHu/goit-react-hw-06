@@ -16,10 +16,10 @@ export const Contact = ({ contact }) => {
     <li className={styles.item}>
         <div className={styles.box}>
             <div className={styles.str}>
-                <IoPerson className={styles.icon} /><span className={styles.name}>   </span>
+                <IoPerson className={styles.icon} /><span className={styles.name}>   {contact.name}</span>
             </div>
             <div className={styles.str}>
-                <FaPhoneAlt className={styles.icon} /><span className={styles.number}>   </span>
+                <FaPhoneAlt className={styles.icon} /><span className={styles.number}>   {contact.number}</span>
             </div>
         </div>
         <Button onClick={handleDeleteContact}>Delete</Button>

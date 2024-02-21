@@ -52,12 +52,12 @@ export default function ContactForm() {
                         <Field
                             className={styles.label}
                             type="text"
-                            name="addUser"
+                            name="name"
                             placeholder="Name Surname"
                             id={nameField}
                         />
                         <ErrorMessage
-                          name="addUser"
+                          name="name"
                           component="span"
                           className={styles.error}
                         />
@@ -73,8 +73,8 @@ export default function ContactForm() {
                             id={numberField}
                         />
                         <ErrorMessage
-                           name="addNumber"
-                           component="div"
+                           name="number"
+                           component="span"
                            className={styles.error}
                         />
                     </div>
